@@ -872,13 +872,9 @@ export default defineComponent({
           }
           element.resource.content.geometry.coordinates = [coordinates]
         } else if (MapElementEnum.CIR === type && geoType === 'Circle') {
-<<<<<<< HEAD
-          let position = element.resource?.content.geometry.coordinates
-=======
           let position = element.resource?.content.geometry
             .coordinates
           // 半径
->>>>>>> feature/0918
           const radius = position[2]
           if (transformType === 'wgs84-gcj02') {
             position = wgs84togcj02(

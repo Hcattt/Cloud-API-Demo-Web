@@ -290,12 +290,8 @@ function selectLayer (keys: string[], e) {
     setBaseInfo()
   }
   visible.value = e.selected
-<<<<<<< HEAD
-  store.commit('SET_DRAW_VISIBLE_INFO', visible.value)
   useGMapCover().getEditorElementFromMap(selectedLayer.value.id)
-=======
   store?.commit('SET_DRAW_VISIBLE_INFO', visible.value)
->>>>>>> feature/0918
   // store.dispatch('updateElement', { type: 'is_select', id: e.node.eventKey, bool: e.selected })
 }
 function getCurrentLayer (id: string) {
@@ -469,20 +465,20 @@ function updateCoordinates (transformType: string, element: LayerResource) {
         })
       }
       element.resource.content.geometry.coordinates = coordinates
-    } else if (MapElementEnum.LINE === type && geoType === 'Polygon') {
+    } else if (MapElementEnum.POLY === type && geoType === 'Polygon') {
       const coordinates = element.resource?.content.geometry
         .coordinates[0] as GeojsonCoordinate[]
 
       if (transformType === 'wgs84-gcj02') {
-        coordinates.forEach(coordinate => {
-          coordinate = wgs84togcj02(
+        coordinates.forEach((coordinate, index) => {
+          coordinates[index] = wgs84togcj02(
             coordinate[0],
             coordinate[1]
           ) as GeojsonCoordinate
         })
       } else if (transformType === 'gcj02-wgs84') {
-        coordinates.forEach(coordinate => {
-          coordinate = gcj02towgs84(
+        coordinates.forEach((coordinate, index) => {
+          coordinates[index] = gcj02towgs84(
             coordinate[0],
             coordinate[1]
           ) as GeojsonCoordinate

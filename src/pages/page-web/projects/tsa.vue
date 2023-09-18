@@ -215,10 +215,10 @@ const onlineDocks = reactive({
   data: [] as OnlineDevice[]
 })
 
-const deviceInfo = computed(() => store.state.deviceState.deviceInfo)
-const dockInfo = computed(() => store.state.deviceState.dockInfo)
+const deviceInfo = computed(() => store?.state?.deviceState.deviceInfo)
+const dockInfo = computed(() => store?.state?.deviceState.dockInfo)
 const hmsInfo = computed({
-  get: () => store.state.hmsInfo,
+  get: () => store?.state?.hmsInfo,
   set: (val) => {
     return val
   }
@@ -227,7 +227,7 @@ const hmsInfo = computed({
 onMounted(() => {
   getOnlineTopo()
   setTimeout(() => {
-    watch(() => store.state.deviceStatusEvent,
+    watch(() => store?.state?.deviceStatusEvent,
       data => {
         getOnlineTopo()
         if (data.deviceOnline.sn) {
