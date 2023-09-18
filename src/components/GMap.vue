@@ -702,8 +702,6 @@ export default defineComponent({
     })
 
     function getDrawCallback ({ obj }) {
-      console.log(333)
-      console.log(obj)
       switch (state.currentType) {
         case MapDoodleEnum.PIN:
           postPinPositionResource(obj)
@@ -746,11 +744,10 @@ export default defineComponent({
       setLayers(req)
       updateCoordinates('gcj02-wgs84', req)
       const result = await postElementsReq(shareId.value, req)
-      obj.setExtData({ id: req.id, name: req.name, area: 222 })
+
       store.state.coverList.push(obj)
     }
     async function postPolygonResource (obj) {
-      console.log(obj, 'hafhhaf')
       const req = getPoygonResource(obj)
       setLayers(req)
       updateCoordinates('gcj02-wgs84', req)
@@ -760,9 +757,8 @@ export default defineComponent({
       // console.log(store.state.coverList)
     }
     function getCircleResource (obj) {
-    // name暂时写死，还在调试中
       const name = '1212'
-      const resource = generateCircleContent([...obj.getCenter().pos, obj.getRadius()])
+      const resource = generateCircleContent(obj.getCenter(), obj.getRadius())
       const id = uuidv4()
       return {
         id,
@@ -878,9 +874,7 @@ export default defineComponent({
           }
           element.resource.content.geometry.coordinates = [coordinates]
         } else if (MapElementEnum.CIR === type && geoType === 'Circle') {
-          let position = element.resource?.content.geometry
-            .coordinates
-            // 半径
+          let position = element.resource?.content.geometry.coordinates
           const radius = position[2]
           if (transformType === 'wgs84-gcj02') {
             position = wgs84togcj02(

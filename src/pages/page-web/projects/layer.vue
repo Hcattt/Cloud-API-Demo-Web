@@ -293,6 +293,7 @@ function selectLayer (keys: string[], e) {
   }
   visible.value = e.selected
   store.commit('SET_DRAW_VISIBLE_INFO', visible.value)
+  useGMapCover().getEditorElementFromMap(selectedLayer.value.id)
   // store.dispatch('updateElement', { type: 'is_select', id: e.node.eventKey, bool: e.selected })
 }
 function getCurrentLayer (id: string) {
