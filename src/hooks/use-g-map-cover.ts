@@ -7,13 +7,18 @@ import pineffbb00 from '/@/assets/icons/pin-ffbb00.svg'
 import { getRoot } from '/@/root'
 import rootStore from '/@/store'
 import { GeojsonCoordinate } from '/@/types/map'
-
+import { useCommon } from './use/common'
+import {
+  updateElementsReq,
+} from '/@/api/layer'
+const { getKeylayer, updateCoordinates, getElementGroups } = useCommon()
+const store = rootStore
 export function useGMapCover () {
   const root = getRoot()
   const AMap = root.$aMap
 
   const normalColor = '#2D8CF0'
-  const store = rootStore
+
   const coverList = store.state.coverList
 
   function AddCoverToMap (cover :any) {
@@ -21,7 +26,19 @@ export function useGMapCover () {
     coverList.push(cover)
     // console.log('coverList:', store.state.coverList)
   }
-
+  // 调整矢量图
+  async function updataElement (position:[], id:any) {
+    console.log(position, 'position---')
+    const selectedLayer = getKeylayer(id)
+    selectedLayer.resource.content.geometry.coordinates = position
+    updateCoordinates('gcj02-wgs84', selectedLayer)
+    console.log(selectedLayer.resource.content, 'selectedLayer.resource.content')
+    const result = await updateElementsReq(id, {
+      name: selectedLayer.name,
+      content: selectedLayer.resource.content
+    })
+    getElementGroups()
+  }
   function getPinIcon (color?:string) {
     // console.log('color', color)
     const colorObj: {
@@ -72,20 +89,27 @@ export function useGMapCover () {
     const circle = new AMap.Circle({
       center: [coordinates[0], coordinates[1]],
       radius: coordinates[2],
-      borderWeight: 3,
-      strokeColor: '#FF33FF',
+      strokeColor: color || normalColor,
       strokeOpacity: 1,
-      strokeWeight: 6,
+      strokeWeight: 2,
+      borderWeight: 3,
       fillOpacity: 0.4,
-      strokeStyle: 'dashed',
       strokeDasharray: [10, 10],
       // 线样式还支持 'dashed'
       fillColor: color,
       zIndex: 50,
     })
     // 点击触发
+    const circleEditor = new AMap.CircleEditor(root.$map, circle)
     circle.on('click', function (e) {
       store.commit('SET_LAYER_ID', data.id)
+      circleEditor.open()
+    })
+    circleEditor.on('adjust', async function (event) {
+      // store.commit('SET_LAYER_ID', layerId)
+      const obj = event.target
+      const position = [obj.getCenter().lng, obj.getCenter().lat, obj.getRadius()]
+      updataElement(position, data.id)
     })
     AddCoverToMap(circle)
   }
@@ -122,7 +146,7 @@ export function useGMapCover () {
         }
       })
     })
-
+    const polylineEditor = new AMap.PolylineEditor(root.$map, polyline)
     // 点击触发
     polyline.on('click', function (e) {
       store.commit('SET_LAYER_ID', data.id)
@@ -132,7 +156,14 @@ export function useGMapCover () {
       })
       root.$map.setFitView([polyline])
       infoWindow.open(root.$map, [coordinates[0][0], coordinates[0][1]])
+      polylineEditor.open()
     })
+    polylineEditor.on('adjust', async function (event) {
+      // store.commit('SET_LAYER_ID', layerId)
+      const obj = event.target
+      const position = obj._opts.path
+      updataElement(position, data.id)
+    }) 
     AddOverlayGroup(polyline)
   }
 
@@ -160,10 +191,18 @@ export function useGMapCover () {
     aroundList.push(coordinates[0])
     const around = AMap.GeometryUtil.distanceOfLine(aroundList).toFixed(1)
     // console.log(around)
+    const polygonEditor = new AMap.PolygonEditor(root.$map, Polygon)
     // 点击触发
     Polygon.on('click', function (e) {
       // console.log(coordinates)
       store.commit('SET_LAYER_ID', data.id)
+      polygonEditor.open()
+    })
+    polygonEditor.on('adjust', async function (event) {
+      // store.commit('SET_LAYER_ID', layerId)
+      const obj = event.target
+      const position = obj._opts.path
+      updataElement([position], data.id)
     })
     // 鼠标移入
     const infoWindow = new AMap.InfoWindow({
@@ -223,15 +262,15 @@ export function useGMapCover () {
     console.log('circleEditor->>', ele)
     root.$map.setFitView([ele])
     const circleEditor = new AMap.PolygonEditor(root.$map, ele)
-    circleEditor.on('move', function(event) {
+    circleEditor.on('move', function (event) {
       console.log('触发事件：move')
     })
 
-    circleEditor.on('adjust', function(event) {
+    circleEditor.on('adjust', function (event) {
       console.log('触发事件：adjust')
     })
 
-    circleEditor.on('end', function(event) {
+    circleEditor.on('end', function (event) {
       console.log('触发事件： end')
       // event.target 即为编辑后的圆形对象
     })

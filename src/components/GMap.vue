@@ -727,7 +727,7 @@ export default defineComponent({
       (req.resource.content.geometry.coordinates as GeojsonCoordinate).push((coordinates as GeojsonCoordinate)[2])
       const result = await postElementsReq(shareId.value, req)
       obj.setExtData({ id: req.id, name: req.name })
-      store.state.coverList.push(obj)
+      store?.state?.coverList.push(obj)
       // console.log(store.state.coverList)
     }
     async function postPolylineResource (obj) {
@@ -736,7 +736,7 @@ export default defineComponent({
       updateCoordinates('gcj02-wgs84', req)
       const result = await postElementsReq(shareId.value, req)
       obj.setExtData({ id: req.id, name: req.name })
-      store.state.coverList.push(obj)
+      store?.state?.coverList.push(obj)
       // console.log(store.state.coverList)
     }
     async function postCircleResource (obj) {
@@ -745,7 +745,7 @@ export default defineComponent({
       updateCoordinates('gcj02-wgs84', req)
       const result = await postElementsReq(shareId.value, req)
 
-      store.state.coverList.push(obj)
+      store?.state?.coverList.push(obj)
     }
     async function postPolygonResource (obj) {
       const req = getPoygonResource(obj)
@@ -753,7 +753,7 @@ export default defineComponent({
       updateCoordinates('gcj02-wgs84', req)
       const result = await postElementsReq(shareId.value, req)
       obj.setExtData({ id: req.id, name: req.name, area: 222 })
-      store.state.coverList.push(obj)
+      store?.state?.coverList.push(obj)
     }
     function getCircleResource (obj) {
       const name = '1212'

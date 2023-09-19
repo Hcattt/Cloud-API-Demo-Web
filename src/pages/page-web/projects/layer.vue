@@ -333,7 +333,6 @@ function setBaseInfo () {
       case GeoType.LineString:
         break
       case GeoType.Polygon:
-
         break
     }
   }
